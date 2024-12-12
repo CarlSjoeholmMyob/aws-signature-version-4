@@ -1,5 +1,6 @@
 ﻿using System;
 using Amazon.Runtime;
+using Amazon.SecurityToken;
 using AwsSignatureVersion4.Private;
 
 namespace AwsSignatureVersion4
@@ -53,6 +54,31 @@ namespace AwsSignatureVersion4
             RegionName = regionName ?? throw new ArgumentNullException(nameof(regionName));
             ServiceName = serviceName ?? throw new ArgumentNullException(nameof(serviceName));
             Credentials = credentials ?? throw new ArgumentNullException(nameof(credentials));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AwsSignatureHandlerSettings"/> class.
+        /// </summary>
+        /// <param name="regionName">
+        /// The system name of the AWS region associated with the endpoint, e.g. "us-east-1".
+        /// </param>
+        /// <param name="serviceName">
+        /// The signing name of the service, e.g. "execute-api".
+        /// </param>
+        /// <param name="securityTokenService">
+        /// The AWS Security Token Service (STS) client.
+        /// </param>
+        /// <param name="roleArn">
+        /// The Amazon Resource Name (ARN) of the role to assume.
+        /// </param>
+        /// <param name="roleSessionName">
+        /// An identifier for the assumed role session.
+        /// </param>
+        public AwsSignatureHandlerSettings(string regionName, string serviceName, IAmazonSecurityTokenService securityTokenService, string roleArn, string roleSessionName)
+        {
+            RegionName = regionName ?? throw new ArgumentNullException(nameof(regionName));
+            ServiceName = serviceName ?? throw new ArgumentNullException(nameof(serviceName));
+            Credentials = new AWSCredentialsWrapper(securityTokenService, roleArn, roleSessionName);
         }
 
         /// <summary>
